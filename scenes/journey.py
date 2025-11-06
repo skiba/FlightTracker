@@ -1,4 +1,5 @@
 from utilities.animator import Animator
+from utilities.airports import get_city_name
 from setup import colours, fonts
 
 from rgbmatrix import graphics
@@ -17,6 +18,20 @@ try:
 except (ModuleNotFoundError, NameError, ImportError):
     # If there's no config data
     JOURNEY_BLANK_FILLER = " ? "
+
+try:
+    from config import JOURNEY_USE_CITY_NAMES
+
+except (ModuleNotFoundError, NameError, ImportError):
+    # If there's no config data
+    JOURNEY_USE_CITY_NAMES = False
+
+try:
+    from config import JOURNEY_CITY_MAX_LENGTH
+
+except (ModuleNotFoundError, NameError, ImportError):
+    # Default max length for city names (to fit on display)
+    JOURNEY_CITY_MAX_LENGTH = 8
 
 # Setup
 JOURNEY_POSITION = (0, 0)
@@ -48,6 +63,19 @@ class JourneyScene(object):
         origin = self._data[self._data_index]["origin"]
         destination = self._data[self._data_index]["destination"]
 
+        # Convert to city names if enabled
+        if JOURNEY_USE_CITY_NAMES:
+            origin_display = get_city_name(origin) or origin
+            dest_display = get_city_name(destination) or destination
+            
+            # Truncate if too long
+            if JOURNEY_CITY_MAX_LENGTH:
+                origin_display = origin_display[:JOURNEY_CITY_MAX_LENGTH]
+                dest_display = dest_display[:JOURNEY_CITY_MAX_LENGTH]
+        else:
+            origin_display = origin
+            dest_display = destination
+
         # Draw background
         self.draw_square(
             JOURNEY_POSITION[0],
@@ -64,7 +92,7 @@ class JourneyScene(object):
             1,
             JOURNEY_HEIGHT,
             JOURNEY_COLOUR,
-            origin if origin else JOURNEY_BLANK_FILLER,
+            origin_display if origin_display else JOURNEY_BLANK_FILLER,
         )
 
         # Draw destination
@@ -76,7 +104,7 @@ class JourneyScene(object):
             text_length + JOURNEY_SPACING,
             JOURNEY_HEIGHT,
             JOURNEY_COLOUR,
-            destination if destination else JOURNEY_BLANK_FILLER,
+            dest_display if dest_display else JOURNEY_BLANK_FILLER,
         )
 
     @Animator.KeyFrame.add(0)

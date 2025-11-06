@@ -17,7 +17,7 @@ except (ModuleNotFoundError, NameError, ImportError):
 
 RETRIES = 3
 RATE_LIMIT_DELAY = 1
-MAX_FLIGHT_LOOKUP = 5
+MAX_FLIGHT_LOOKUP = 10  # Increased from 5 to 10 flights
 MAX_ALTITUDE = 10000  # feet
 EARTH_RADIUS_KM = 6371
 BLANK_FIELDS = ["", "N/A", "NONE"]

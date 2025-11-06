@@ -58,7 +58,8 @@ RAINFALL_OVERSPILL_FLASH_ENABLED = True
 TEMPERATURE_REFRESH_SECONDS = 60
 TEMPERATURE_FONT = fonts.extrasmall
 TEMPERATURE_FONT_HEIGHT = 5
-TEMPERATURE_POSITION = (48, TEMPERATURE_FONT_HEIGHT + 1)
+TEMPERATURE_CHAR_WIDTH = 4  # Approximate width per character for extrasmall font
+TEMPERATURE_POSITION = (63, TEMPERATURE_FONT_HEIGHT + 1)  # Right-align to x=63 (1px from edge at 64)
 
 TEMPERATURE_COLOURS = (
     (0, colours.WHITE),
@@ -188,6 +189,7 @@ class WeatherScene(object):
         self._last_upcoming_rain_and_temp = None
         self._last_temperature = None
         self._last_temperature_str = None
+        self._last_temperature_x = None
 
         # Attempt to grab the current temperature using OPENWEATHER if a key
         # is provided otherwise fallback on the taps-aff service
@@ -225,7 +227,7 @@ class WeatherScene(object):
         if current_temperature > max_temp:
             ratio = 1
         elif current_temperature > min_temp:
-            ratio = (current_temperature - min_temp) / max_temp
+            ratio = (current_temperature - min_temp) / (max_temp - min_temp)
         else:
             ratio = 0
 
@@ -345,27 +347,32 @@ class WeatherScene(object):
                 except WeatherError:
                     continue
 
-        if self._last_temperature_str is not None:
-            # Undraw old temperature
+        if self._last_temperature_str is not None and self._last_temperature_x is not None:
+            # Undraw old temperature using stored X position
             _ = graphics.DrawText(
                 self.canvas,
                 TEMPERATURE_FONT,
-                TEMPERATURE_POSITION[0],
+                self._last_temperature_x,
                 TEMPERATURE_POSITION[1],
                 colours.BLACK,
                 self._last_temperature_str,
             )
 
         if self.current_temperature:
-            temp_str = f"{round(self.current_temperature)}°".rjust(4, " ")
+            temp_str = f"{self.current_temperature:.1f}\u00B0C"
 
             temp_colour = self.temperature_to_colour(self.current_temperature)
 
+            # Calculate X position to right-align to TEMPERATURE_POSITION[0]
+            # DrawText returns the width of the drawn text
+            estimated_width = len(temp_str) * TEMPERATURE_CHAR_WIDTH
+            temp_x = TEMPERATURE_POSITION[0] - estimated_width
+            
             # Draw temperature
-            _ = graphics.DrawText(
+            temp_width = graphics.DrawText(
                 self.canvas,
                 TEMPERATURE_FONT,
-                TEMPERATURE_POSITION[0],
+                temp_x,
                 TEMPERATURE_POSITION[1],
                 temp_colour,
                 temp_str,
@@ -373,3 +380,4 @@ class WeatherScene(object):
 
             self._last_temperature = self.current_temperature
             self._last_temperature_str = temp_str
+            self._last_temperature_x = temp_x
