@@ -28,7 +28,7 @@ echo "📝 Copying planedetails.py (route display in scrolling text)..."
 scp scenes/planedetails.py $PI_HOST:$PI_PATH/scenes/
 
 # Copy updated config
-echo "📝 Copying config.py (new configuration options)..."
+echo "📝 Copying config.py (your settings and API key)..."
 scp config.py $PI_HOST:$PI_PATH/
 
 echo ""
