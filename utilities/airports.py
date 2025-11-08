@@ -45,6 +45,7 @@ AIRPORT_CITY_MAP = {
     "LTN": "London",
     "LCY": "London",
     "MAN": "Manchester",
+    "LPL": "Liverpool",
     "BHX": "Birmingham",
     "EDI": "Edinburgh",
     "GLA": "Glasgow",
