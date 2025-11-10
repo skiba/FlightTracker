@@ -178,6 +178,7 @@ AIRPORT_CITY_MAP = {
     # Eastern Europe
     "BUD": "Budapest",
     "OTP": "Bucharest",
+    "CND": "Constanta",
     "KIV": "Chisinau",
     "LWO": "Lviv",
     "IEV": "Kyiv",
