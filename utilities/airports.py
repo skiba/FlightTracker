@@ -36,6 +36,7 @@ AIRPORT_CITY_MAP = {
     "HAJ": "Hannover",
     "LEJ": "Leipzig",
     "BRE": "Bremen",
+    "WIE": "Wiesbaden",
     "DRS": "Dresden",
 
     # UK & Ireland
