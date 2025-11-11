@@ -184,6 +184,8 @@ AIRPORT_CITY_MAP = {
     "IEV": "Kyiv",
     "KBP": "Kyiv",
     "MSQ": "Minsk",
+    "KUT": "Kutaisi",
+    "TBS": "Tbilisi",
 
     # Egypt & Middle East
     "HRG": "Hurghada",
