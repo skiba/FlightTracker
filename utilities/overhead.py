@@ -7,6 +7,8 @@ from requests.exceptions import ConnectionError
 from urllib3.exceptions import NewConnectionError
 from urllib3.exceptions import MaxRetryError
 
+from utilities.aircraft_types import lookup as lookup_aircraft_type
+
 try:
     # Attempt to load config data
     from config import MIN_ALTITUDE
@@ -107,13 +109,9 @@ class Overhead:
 
                     # Grab and store details
                     try:
-                        details = self._api.get_flight_details(flight)
-
-                        # Get plane type
-                        try:
-                            plane = details["aircraft"]["model"]["text"]
-                        except (KeyError, TypeError):
-                            plane = ""
+                        # FR24 get_flight_details() returns 403 since they locked down
+                        # the clickhandler endpoint. Use local ICAO type-code lookup.
+                        plane = lookup_aircraft_type(flight.aircraft_code)
 
                         # Tidy up what we pass along
                         plane = plane if not (plane.upper() in BLANK_FIELDS) else ""

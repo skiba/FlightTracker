@@ -6,6 +6,37 @@
 
 [![Finished flight tracker showing a flight](https://blog.colinwaddell.com/user/pages/01.articles/02.flight-tracker/screen-flight-thumb.jpg)](https://blog.colinwaddell.com/user/pages/01.articles/02.flight-tracker/screen-flight-thumb.jpg)
 
+# FR24 clickhandler fix (this fork)
+
+Upstream stopped showing flights because FlightRadar24 locked down the
+`data-live.flightradar24.com/clickhandler/` endpoint, returning HTTP 403 for
+the unauthenticated requests `FlightRadarAPI`'s `get_flight_details()` makes.
+The HTTPError was uncaught and killed the data-grabber thread silently.
+
+This fork keeps FR24 as the live data source — `get_flights()` (the bounds
+query) still works and returns callsign, origin, destination, altitude,
+position and the ICAO **aircraft type code** (e.g. `B738`, `A359`). The only
+thing the broken `get_flight_details()` was adding was the human-readable
+aircraft model text. We resolve that locally:
+
+- `assets/icao_types.csv` — ICAO type-designator → manufacturer + model,
+  sourced once from [rikgale/ICAOList](https://github.com/rikgale/ICAOList)
+  (~2700 entries, ~140 KB, public domain).
+- `utilities/aircraft_types.py` — loads the CSV at import and exposes
+  `lookup(code)`.
+- `utilities/overhead.py` — patched to call the local lookup instead of
+  `get_flight_details()`. Display behaviour is unchanged for the user.
+
+To refresh the CSV when new aircraft types enter service:
+
+```
+curl -sSfL -o assets/icao_types.csv \
+  https://raw.githubusercontent.com/rikgale/ICAOList/main/ICAOList.csv
+```
+
+If FR24 ever locks down `get_flights()` too, the next step would be to swap
+the live source for [OpenSky Network](https://opensky-network.org/).
+
 # Setup
 
 ## Installation
