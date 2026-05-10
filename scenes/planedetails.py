@@ -1,6 +1,7 @@
 from rgbmatrix import graphics
 
 from utilities.animator import Animator
+from utilities.airports import get_city_name
 from setup import colours, fonts, screen
 
 # Setup
@@ -8,6 +9,17 @@ PLANE_DETAILS_COLOUR = colours.PINK
 PLANE_DISTANCE_FROM_TOP = 30
 PLANE_TEXT_HEIGHT = 9
 PLANE_FONT = fonts.regular
+
+# Configuration for route display
+try:
+    from config import PLANE_DETAILS_SHOW_ROUTE
+except (ModuleNotFoundError, NameError, ImportError):
+    PLANE_DETAILS_SHOW_ROUTE = True  # Show city route by default
+
+try:
+    from config import PLANE_DETAILS_ROUTE_SEPARATOR
+except (ModuleNotFoundError, NameError, ImportError):
+    PLANE_DETAILS_ROUTE_SEPARATOR = " > "  # Separator between cities (e.g., "Frankfurt > Poznan")
 
 
 class PlaneDetailsScene(object):
@@ -23,7 +35,30 @@ class PlaneDetailsScene(object):
         if len(self._data) == 0:
             return
 
+        # Build display text
         plane = f'{self._data[self._data_index]["plane"]}'
+        
+        # Add route information if enabled
+        if PLANE_DETAILS_SHOW_ROUTE:
+            origin = self._data[self._data_index]["origin"]
+            destination = self._data[self._data_index]["destination"]
+            
+            # Get city names
+            origin_city = get_city_name(origin) or origin
+            dest_city = get_city_name(destination) or destination
+            
+            # Build route string with configurable separator
+            if origin_city and dest_city:
+                route = f" - {origin_city}{PLANE_DETAILS_ROUTE_SEPARATOR}{dest_city}"
+            elif origin_city or dest_city:
+                route = f" - {origin_city or dest_city}"
+            else:
+                route = ""
+            
+            # Combine plane and route
+            display_text = plane + route
+        else:
+            display_text = plane
 
         # Draw background
         self.draw_square(
@@ -41,7 +76,7 @@ class PlaneDetailsScene(object):
             self.plane_position,
             PLANE_DISTANCE_FROM_TOP,
             PLANE_DETAILS_COLOUR,
-            plane,
+            display_text,
         )
 
         # Handle scrolling

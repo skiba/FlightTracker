@@ -63,7 +63,7 @@ class Display(
     def __init__(self):
         # Setup Display
         options = RGBMatrixOptions()
-        options.hardware_mapping = "adafruit-hat-pwm" if HAT_PWM_ENABLED else "adafruit-hat"
+        options.hardware_mapping = "adafruit-hat"
         options.rows = 32
         options.cols = 64
         options.chain_length = 1
@@ -163,6 +163,7 @@ class Display(
         try:
             # Start loop
             print("Press CTRL-C to stop")
+            print("🟢 Display loop starting...")
             self.play()
 
         except KeyboardInterrupt:
